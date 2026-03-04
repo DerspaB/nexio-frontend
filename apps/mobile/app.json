@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Nexio",
+    "slug": "nexio",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "nexio",
+    "platforms": ["ios", "android"],
+    "plugins": ["expo-router"]
+  }
+}
