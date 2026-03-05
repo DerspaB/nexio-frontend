@@ -7,6 +7,8 @@ import { useSocket } from '@/hooks/use-socket';
 import { useChat } from '@/hooks/use-chat';
 import { ConversationList } from '@/components/features/messages/ConversationList';
 import { ChatThread } from '@/components/features/messages/ChatThread';
+import { NewConversationModal } from '@/components/features/messages/NewConversationModal';
+import type { Conversation } from '@nexio/types';
 
 function getCurrentUserId(): string {
   try {
@@ -19,6 +21,7 @@ function getCurrentUserId(): string {
 export default function MessagesPage() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState('');
+  const [showNewModal, setShowNewModal] = useState(false);
 
   const { conversations, isLoading, mutate } = useConversations();
   const { socket, isConnected, showReconnecting } = useSocket();
@@ -64,6 +67,14 @@ export default function MessagesPage() {
     [],
   );
 
+  const handleConversationCreated = useCallback(
+    (conv: Conversation) => {
+      mutate();
+      setActiveConversationId(conv.id);
+    },
+    [mutate],
+  );
+
   // Mark as read when opening a conversation
   useEffect(() => {
     if (activeConversationId) {
@@ -107,6 +118,7 @@ export default function MessagesPage() {
         activeConversationId={activeConversationId}
         isLoading={isLoading}
         onSelect={handleSelectConversation}
+        onNewConversation={() => setShowNewModal(true)}
       />
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -139,6 +151,11 @@ export default function MessagesPage() {
           />
         )}
       </div>
+      <NewConversationModal
+        isOpen={showNewModal}
+        onClose={() => setShowNewModal(false)}
+        onConversationCreated={handleConversationCreated}
+      />
     </div>
   );
 }

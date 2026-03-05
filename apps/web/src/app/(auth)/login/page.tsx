@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { loginSchema } from "@nexio/validations";
 import { authApi, apiClient } from "@/lib/api";
-import type { ZodError } from "zod";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -124,7 +123,7 @@ export default function LoginPage() {
           )}
         </div>
 
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginBottom: 16 }}>
           <label
             htmlFor="password"
             style={{
@@ -163,6 +162,15 @@ export default function LoginPage() {
               {fieldErrors.password}
             </span>
           )}
+        </div>
+
+        <div style={{ textAlign: "right", marginBottom: 20 }}>
+          <Link
+            href="/forgot-password"
+            style={{ fontSize: 13, color: "var(--color-primary)", textDecoration: "none" }}
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
         </div>
 
         <button

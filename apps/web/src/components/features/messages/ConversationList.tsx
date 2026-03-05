@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { MessageSquare, Search } from 'lucide-react';
+import { MessageSquare, Search, SquarePen } from 'lucide-react';
 import type { ConversationListItem } from '@nexio/types';
 import { ConversationItem } from './ConversationItem';
 
@@ -11,6 +11,7 @@ interface ConversationListProps {
   activeConversationId: string | null;
   isLoading: boolean;
   onSelect: (conversationId: string) => void;
+  onNewConversation: () => void;
 }
 
 export function ConversationList({
@@ -19,6 +20,7 @@ export function ConversationList({
   activeConversationId,
   isLoading,
   onSelect,
+  onNewConversation,
 }: ConversationListProps) {
   const [search, setSearch] = useState('');
 
@@ -55,6 +57,27 @@ export function ConversationList({
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <MessageSquare size={20} style={{ color: 'var(--color-primary)' }} />
           <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>Mensajes</h2>
+          <div style={{ flex: 1 }} />
+          <button
+            onClick={onNewConversation}
+            title="Nueva conversación"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: 6,
+              borderRadius: 8,
+              color: 'var(--color-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'background-color 0.15s',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#EEF2FF'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+          >
+            <SquarePen size={18} />
+          </button>
         </div>
 
         <div style={{ position: 'relative' }}>

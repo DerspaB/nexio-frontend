@@ -4,6 +4,9 @@ export type {
   RegisterRequest,
   UserPayload,
   AuthResponse,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+  AuthMessageResponse,
 } from './auth';
 export type { User, CreateUserRequest, UpdateUserRequest } from './user';
 export type {

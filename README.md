@@ -39,15 +39,17 @@ pnpm dev
 │   ├── web/                         # Next.js 14 — Coach dashboard
 │   │   └── src/
 │   │       ├── app/
-│   │       │   ├── (auth)/          # Login, Register (public routes)
+│   │       │   ├── (auth)/          # Login, Register, Forgot/Reset password (public routes)
 │   │       │   └── (dashboard)/     # Protected routes (requires JWT)
 │   │       │       ├── dashboard/   # Home page
 │   │       │       ├── clients/     # Clients list (table, filters, search)
-│   │       │       └── clients/[id] # Client detail (tabs: General, Plan, Check-ins)
+│   │       │       ├── clients/[id] # Client detail (tabs: General, Plan, Check-ins)
+│   │       │       └── messages/    # Real-time messaging (WebSocket)
 │   │       ├── components/
 │   │       │   └── features/
-│   │       │       └── clients/     # ClientsTable, ClientStatusPill, CreateClientModal, etc.
-│   │       ├── hooks/               # useClients, useClient (SWR hooks)
+│   │       │       ├── clients/     # ClientsTable, ClientStatusPill, CreateClientModal, etc.
+│   │       │       └── messages/    # ConversationList, ChatThread, NewConversationModal, etc.
+│   │       ├── hooks/               # useClients, useClient, useConversations, useChat (SWR + WebSocket)
 │   │       └── lib/
 │   │           └── api.ts           # API client instance
 │   └── mobile/                      # Expo — Client app (scaffold)
@@ -83,8 +85,11 @@ Shared TypeScript interfaces mirroring backend API responses.
 | ---------------------- | -------------------------------------------------------------------------------------------- |
 | `User`                 | Full user object (id, email, role, organizationId, etc.)                                     |
 | `AuthResponse`         | Login/register response (accessToken + user)                                                 |
+| `AuthMessageResponse`  | Generic auth response with message (forgot/reset password)                                   |
 | `LoginRequest`         | Login payload (email, password)                                                              |
 | `RegisterRequest`      | Register payload (email, password, names, org)                                               |
+| `ForgotPasswordRequest`| Forgot password payload (email)                                                              |
+| `ResetPasswordRequest` | Reset password payload (token, password)                                                     |
 | `CreateUserRequest`    | Create user payload (email, password, names, role)                                           |
 | `UpdateUserRequest`    | Partial update payload (names, role, isActive)                                               |
 | `PaginatedResponse<T>` | Generic paginated list (data, total, page, limit, totalPages)                                |
@@ -123,6 +128,8 @@ const client = new ApiClient('http://localhost:3001/api');
 const authApi = createAuthApi(client);
 await authApi.login({ email, password });        // POST /auth/login
 await authApi.register({ ... });                  // POST /auth/register
+await authApi.forgotPassword({ email });          // POST /auth/forgot-password
+await authApi.resetPassword({ token, password }); // POST /auth/reset-password
 
 // Users (requires JWT)
 client.setToken(accessToken);
@@ -148,23 +155,25 @@ await clientsApi.deleteClient(id);                   // DELETE /clients/:id
 | `Role`          | Enum object: `OWNER`, `ADMIN`, `COACH`, `CLIENT`           |
 | `ClientStatus`  | Enum object: `ACTIVE`, `AT_RISK`, `TRIAL`, `INACTIVE`      |
 | `DESIGN_TOKENS` | Colors, spacing (8pt grid), border radius                  |
-| `API_ROUTES`    | Route map for all backend endpoints (auth, users, clients) |
+| `API_ROUTES`    | Route map for all backend endpoints (auth, users, clients, messaging) |
 
 ## API endpoints covered
 
-| Method | Route            | Auth   | Roles               | Function                    |
-| ------ | ---------------- | ------ | ------------------- | --------------------------- |
-| POST   | `/auth/register` | Public | —                   | `authApi.register()`        |
-| POST   | `/auth/login`    | Public | —                   | `authApi.login()`           |
-| GET    | `/users`         | JWT    | OWNER, ADMIN        | `usersApi.getUsers()`       |
-| GET    | `/users/:id`     | JWT    | OWNER, ADMIN        | `usersApi.getUser()`        |
-| POST   | `/users`         | JWT    | OWNER, ADMIN        | `usersApi.createUser()`     |
-| PATCH  | `/users/:id`     | JWT    | OWNER, ADMIN        | `usersApi.updateUser()`     |
-| GET    | `/clients`       | JWT    | OWNER, ADMIN, COACH | `clientsApi.getClients()`   |
-| GET    | `/clients/:id`   | JWT    | OWNER, ADMIN, COACH | `clientsApi.getClient()`    |
-| POST   | `/clients`       | JWT    | OWNER, ADMIN, COACH | `clientsApi.createClient()` |
-| PATCH  | `/clients/:id`   | JWT    | OWNER, ADMIN, COACH | `clientsApi.updateClient()` |
-| DELETE | `/clients/:id`   | JWT    | OWNER, ADMIN        | `clientsApi.deleteClient()` |
+| Method | Route                    | Auth   | Roles               | Function                    |
+| ------ | ------------------------ | ------ | ------------------- | --------------------------- |
+| POST   | `/auth/register`         | Public | —                   | `authApi.register()`        |
+| POST   | `/auth/login`            | Public | —                   | `authApi.login()`           |
+| POST   | `/auth/forgot-password`  | Public | —                   | `authApi.forgotPassword()`  |
+| POST   | `/auth/reset-password`   | Public | —                   | `authApi.resetPassword()`   |
+| GET    | `/users`                 | JWT    | OWNER, ADMIN        | `usersApi.getUsers()`       |
+| GET    | `/users/:id`             | JWT    | OWNER, ADMIN        | `usersApi.getUser()`        |
+| POST   | `/users`                 | JWT    | OWNER, ADMIN        | `usersApi.createUser()`     |
+| PATCH  | `/users/:id`             | JWT    | OWNER, ADMIN        | `usersApi.updateUser()`     |
+| GET    | `/clients`               | JWT    | OWNER, ADMIN, COACH | `clientsApi.getClients()`   |
+| GET    | `/clients/:id`           | JWT    | OWNER, ADMIN, COACH | `clientsApi.getClient()`    |
+| POST   | `/clients`               | JWT    | OWNER, ADMIN, COACH | `clientsApi.createClient()` |
+| PATCH  | `/clients/:id`           | JWT    | OWNER, ADMIN, COACH | `clientsApi.updateClient()` |
+| DELETE | `/clients/:id`           | JWT    | OWNER, ADMIN        | `clientsApi.deleteClient()` |
 
 ## Authentication flow
 
@@ -174,6 +183,13 @@ await clientsApi.deleteClient(id);                   // DELETE /clients/:id
 4. Frontend stores `token` and `user` in `localStorage`
 5. `ApiClient.setToken()` attaches `Authorization: Bearer {jwt}` to all subsequent requests
 6. Dashboard layout checks `localStorage` on mount; redirects to `/login` if missing
+
+### Password reset flow
+
+1. User clicks "Forgot password?" on login page
+2. `/forgot-password` — user enters email, backend sends reset link (always shows success for security)
+3. `/reset-password?token=xxx` — user sets new password with strength indicator and confirmation
+4. On success, user is redirected to login
 
 ## Design tokens
 
@@ -207,20 +223,26 @@ await clientsApi.deleteClient(id);                   // DELETE /clients/:id
 
 ## Web dashboard pages
 
-| Route           | Description                                                                              | Components                                                               |
-| --------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `/login`        | Login form with Zod validation                                                           | —                                                                        |
-| `/register`     | Register form (creates org + owner)                                                      | —                                                                        |
-| `/dashboard`    | Home with placeholder cards                                                              | —                                                                        |
-| `/clients`      | Client list with table, search (debounce 300ms), status filter, pagination, create modal | `ClientsTable`, `ClientStatusPill`, `CreateClientModal`                  |
-| `/clients/[id]` | Client detail with tabs (General, Plan, Check-ins), editable status, tags, notes         | `ClientHeader`, `ClientGeneralTab`, `ClientPlanTab`, `ClientCheckInsTab` |
+| Route               | Description                                                                                  | Components                                                                       |
+| ------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `/login`            | Login form with Zod validation, forgot password link                                         | —                                                                                |
+| `/register`         | Register form (creates org + owner)                                                          | —                                                                                |
+| `/forgot-password`  | Email form to request password reset (always shows success for security)                     | —                                                                                |
+| `/reset-password`   | New password form with strength indicator, token validated from URL                          | —                                                                                |
+| `/dashboard`        | Home with placeholder cards                                                                  | —                                                                                |
+| `/clients`          | Client list with table, search (debounce 300ms), status filter, pagination, create modal     | `ClientsTable`, `ClientStatusPill`, `CreateClientModal`                          |
+| `/clients/[id]`     | Client detail with tabs (General, Plan, Check-ins), editable status, tags, notes             | `ClientHeader`, `ClientGeneralTab`, `ClientPlanTab`, `ClientCheckInsTab`         |
+| `/messages`         | Real-time messaging with conversation list, chat thread, new conversation modal              | `ConversationList`, `ChatThread`, `NewConversationModal`, `MessageBubble`        |
 
 ## Hooks
 
-| Hook                  | File                   | Description                                      |
-| --------------------- | ---------------------- | ------------------------------------------------ |
-| `useClients(filters)` | `hooks/use-clients.ts` | SWR fetch for paginated client list with filters |
-| `useClient(id)`       | `hooks/use-client.ts`  | SWR fetch for single client by ID                |
+| Hook                    | File                         | Description                                           |
+| ----------------------- | ---------------------------- | ----------------------------------------------------- |
+| `useClients(filters)`   | `hooks/use-clients.ts`       | SWR fetch for paginated client list with filters      |
+| `useClient(id)`         | `hooks/use-client.ts`        | SWR fetch for single client by ID                     |
+| `useConversations()`    | `hooks/use-conversations.ts` | SWR fetch for conversation list with unread counts    |
+| `useChat(conversationId)` | `hooks/use-chat.ts`        | SWR fetch for messages + real-time updates            |
+| `useSocket()`           | `hooks/use-socket.ts`        | WebSocket connection management with auto-reconnect   |
 
 ## Role isolation
 
