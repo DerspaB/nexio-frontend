@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import type { Message } from '@nexio/types';
 import { messagingApi } from '@/lib/api';
+import { getUser } from '@/lib/auth';
 
 interface LocalMessage extends Message {
   _status?: 'sending' | 'sent';
@@ -86,8 +87,7 @@ export function useChat({ conversationId, socket, isConnected }: UseChatOptions)
       if (!socket || !isConnected || !conversationId || !content.trim()) return;
 
       const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-      const userData = localStorage.getItem('user');
-      const user = userData ? JSON.parse(userData) : { id: '', firstName: '', lastName: '' };
+      const user = getUser() ?? { id: '', firstName: '', lastName: '' };
 
       const optimistic: LocalMessage = {
         id: tempId,

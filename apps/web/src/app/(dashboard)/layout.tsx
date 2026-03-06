@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { LayoutDashboard, Users, ClipboardList, MessageSquare, Settings } from 'lucide-react';
 import { apiClient } from '@/lib/api';
+import { getToken, getUser, clearAuth } from '@/lib/auth';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { useConversations } from '@/hooks/use-conversations';
 import type { UserPayload } from '@nexio/types';
@@ -19,8 +20,8 @@ export default function DashboardLayout({
   const { totalUnread } = useConversations();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
+    const token = getToken();
+    const userData = getUser();
 
     if (!token || !userData) {
       router.push('/login');
@@ -28,7 +29,7 @@ export default function DashboardLayout({
     }
 
     apiClient.setToken(token);
-    setUser(JSON.parse(userData));
+    setUser(userData);
   }, [router]);
 
   if (!user) {
@@ -133,8 +134,7 @@ export default function DashboardLayout({
           <p style={{ color: 'var(--color-text-secondary)', fontSize: 12 }}>{user.role}</p>
           <button
             onClick={() => {
-              localStorage.removeItem('token');
-              localStorage.removeItem('user');
+              clearAuth();
               apiClient.setToken(null);
               router.push('/login');
             }}

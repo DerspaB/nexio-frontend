@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { registerSchema } from '@nexio/validations';
 import { authApi, apiClient } from '@/lib/api';
+import { setAuth } from '@/lib/auth';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 
 export default function RegisterPage() {
@@ -43,8 +44,7 @@ export default function RegisterPage() {
     try {
       const response = await authApi.register(result.data);
       apiClient.setToken(response.accessToken);
-      localStorage.setItem('token', response.accessToken);
-      localStorage.setItem('user', JSON.stringify(response.user));
+      setAuth(response.accessToken, response.user);
       router.push('/dashboard');
     } catch {
       setError('Error al registrar. Verifica los datos e intenta de nuevo.');

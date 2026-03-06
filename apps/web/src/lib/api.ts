@@ -12,9 +12,9 @@ import {
   createMessagingApi,
 } from '@nexio/api-client';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-export const apiClient = new ApiClient(apiUrl);
+export const apiClient = new ApiClient(API_URL);
 export const authApi = createAuthApi(apiClient);
 export const usersApi = createUsersApi(apiClient);
 export const clientsApi = createClientsApi(apiClient);

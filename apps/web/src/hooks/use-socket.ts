@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { io, type Socket } from 'socket.io-client';
+import { API_URL } from '@/lib/api';
+import { getToken } from '@/lib/auth';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 const SOCKET_URL = API_URL.replace('/api', '');
 const RECONNECT_TOAST_DELAY = 3000;
 
@@ -14,7 +15,7 @@ export function useSocket() {
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   const connect = useCallback(() => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if (!token) return;
 
     if (socketRef.current) {

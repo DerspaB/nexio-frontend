@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { loginSchema } from "@nexio/validations";
 import { authApi, apiClient } from "@/lib/api";
+import { setAuth } from "@/lib/auth";
 import { ErrorAlert } from "@/components/ui/ErrorAlert";
 
 export default function LoginPage() {
@@ -34,8 +35,7 @@ export default function LoginPage() {
     try {
       const response = await authApi.login(result.data);
       apiClient.setToken(response.accessToken);
-      localStorage.setItem("token", response.accessToken);
-      localStorage.setItem("user", JSON.stringify(response.user));
+      setAuth(response.accessToken, response.user);
       router.push("/dashboard");
     } catch (err) {
       setError("Credenciales inválidas. Intenta de nuevo.");

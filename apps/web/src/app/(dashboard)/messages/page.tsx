@@ -9,13 +9,10 @@ import { ConversationList } from '@/components/features/messages/ConversationLis
 import { ChatThread } from '@/components/features/messages/ChatThread';
 import { NewConversationModal } from '@/components/features/messages/NewConversationModal';
 import type { Conversation } from '@nexio/types';
+import { getUser } from '@/lib/auth';
 
 function getCurrentUserId(): string {
-  try {
-    const raw = localStorage.getItem('user');
-    if (raw) return JSON.parse(raw).id ?? '';
-  } catch {}
-  return '';
+  return getUser()?.id ?? '';
 }
 
 export default function MessagesPage() {
