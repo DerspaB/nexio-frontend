@@ -80,7 +80,7 @@ export function ChatThread({
   useEffect(() => {
     bottomRef.current?.scrollIntoView();
     prevMessagesLenRef.current = messages.length;
-  }, [participantName]);
+  }, [participantName, messages.length]);
 
   function handleScroll() {
     const el = scrollRef.current;

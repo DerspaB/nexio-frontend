@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -15,7 +15,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import type { Plan, WorkoutBlock, WorkoutDay, BlockType } from '@nexio/types';
+import type { Plan, WorkoutBlock, BlockType } from '@nexio/types';
 import { plansApi, daysApi, blocksApi } from '@/lib/api';
 import { PlanHeader } from './PlanHeader';
 import { PlanSidebar } from './PlanSidebar';
@@ -30,7 +30,7 @@ interface PlanEditorProps {
 }
 
 export function PlanEditor({ plan, onMutate }: PlanEditorProps) {
-  const days = plan.workoutDays ?? [];
+  const days = useMemo(() => plan.workoutDays ?? [], [plan.workoutDays]);
   const [selectedDayId, setSelectedDayId] = useState<string | null>(days[0]?.id ?? null);
   const [localBlocks, setLocalBlocks] = useState<WorkoutBlock[]>([]);
   const [saving, setSaving] = useState(false);
