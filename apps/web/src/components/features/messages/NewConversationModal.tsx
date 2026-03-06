@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { X, Search } from 'lucide-react';
+import { Skeleton } from '@/components/ui/Skeleton';
+import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { useClients } from '@/hooks/use-clients';
 import { messagingApi } from '@/lib/api';
 import type { Conversation } from '@nexio/types';
@@ -160,17 +162,8 @@ export function NewConversationModal({
         </div>
 
         {error && (
-          <div
-            style={{
-              margin: '0 20px 8px',
-              padding: '8px 12px',
-              backgroundColor: '#FEE2E2',
-              color: '#C62828',
-              borderRadius: 'var(--radius-input)',
-              fontSize: 13,
-            }}
-          >
-            {error}
+          <div style={{ margin: '0 20px 8px' }}>
+            <ErrorAlert message={error} />
           </div>
         )}
 
@@ -187,35 +180,10 @@ export function NewConversationModal({
                     padding: '10px 12px',
                   }}
                 >
-                  <div
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: '50%',
-                      backgroundColor: 'var(--color-border)',
-                      animation: 'pulse 1.5s ease-in-out infinite',
-                    }}
-                  />
+                  <Skeleton width={36} height={36} borderRadius="50%" />
                   <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        width: '50%',
-                        height: 13,
-                        backgroundColor: 'var(--color-border)',
-                        borderRadius: 4,
-                        marginBottom: 4,
-                        animation: 'pulse 1.5s ease-in-out infinite',
-                      }}
-                    />
-                    <div
-                      style={{
-                        width: '70%',
-                        height: 11,
-                        backgroundColor: 'var(--color-border)',
-                        borderRadius: 4,
-                        animation: 'pulse 1.5s ease-in-out infinite',
-                      }}
-                    />
+                    <Skeleton width="50%" height={13} style={{ marginBottom: 4 }} />
+                    <Skeleton width="70%" height={11} />
                   </div>
                 </div>
               ))}

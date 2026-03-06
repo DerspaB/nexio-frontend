@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users, AlertTriangle, TrendingUp, Flame, ChevronRight } from 'lucide-react';
 import type { UserPayload, Client } from '@nexio/types';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { clientsApi } from '@/lib/api';
 
 interface KpiData {
@@ -104,8 +105,8 @@ export default function DashboardPage() {
           border: '1px solid var(--color-border)',
         }}
       >
-        <div style={{ width: 100, height: 12, backgroundColor: 'var(--color-border)', borderRadius: 4, marginBottom: 12, animation: 'pulse 1.5s ease-in-out infinite' }} />
-        <div style={{ width: 60, height: 28, backgroundColor: 'var(--color-border)', borderRadius: 4, animation: 'pulse 1.5s ease-in-out infinite' }} />
+        <Skeleton width={100} height={12} style={{ marginBottom: 12 }} />
+        <Skeleton width={60} height={28} />
       </div>
     );
   }
@@ -183,16 +184,7 @@ export default function DashboardPage() {
         {loading && (
           <div>
             {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  height: 48,
-                  backgroundColor: 'var(--color-border)',
-                  borderRadius: 8,
-                  marginBottom: 8,
-                  animation: 'pulse 1.5s ease-in-out infinite',
-                }}
-              />
+              <Skeleton key={i} height={48} borderRadius={8} style={{ marginBottom: 8 }} />
             ))}
           </div>
         )}

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ClipboardCheck } from 'lucide-react';
 import type { CheckIn } from '@nexio/types';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { checkInsApi } from '@/lib/api';
 
 interface ClientCheckInsTabProps {
@@ -77,8 +78,8 @@ export function ClientCheckInsTab({ clientId }: ClientCheckInsTabProps) {
   if (loading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div style={{ height: 120, backgroundColor: 'var(--color-border)', borderRadius: 'var(--radius-card)', animation: 'pulse 1.5s ease-in-out infinite' }} />
-        <div style={{ height: 200, backgroundColor: 'var(--color-border)', borderRadius: 'var(--radius-card)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+        <Skeleton height={120} borderRadius="var(--radius-card)" />
+        <Skeleton height={200} borderRadius="var(--radius-card)" />
       </div>
     );
   }

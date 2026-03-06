@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { LayoutDashboard, Users, ClipboardList, MessageSquare, Settings } from 'lucide-react';
 import { apiClient } from '@/lib/api';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useConversations } from '@/hooks/use-conversations';
 import type { UserPayload } from '@nexio/types';
 
@@ -40,15 +41,7 @@ export default function DashboardLayout({
           justifyContent: 'center',
         }}
       >
-        <div
-          style={{
-            width: 200,
-            height: 20,
-            backgroundColor: 'var(--color-border)',
-            borderRadius: 'var(--radius-input)',
-            animation: 'pulse 1.5s ease-in-out infinite',
-          }}
-        />
+        <Skeleton width={200} height={20} borderRadius="var(--radius-input)" />
       </div>
     );
   }

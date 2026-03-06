@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { authApi } from '@/lib/api';
+import { ErrorAlert } from '@/components/ui/ErrorAlert';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -84,22 +85,7 @@ export default function ForgotPasswordPage() {
         Ingresa tu email y te enviaremos instrucciones
       </p>
 
-      {error && (
-        <div
-          role="alert"
-          aria-live="polite"
-          style={{
-            backgroundColor: '#FEE2E2',
-            color: 'var(--color-danger)',
-            padding: '12px 16px',
-            borderRadius: 'var(--radius-input)',
-            marginBottom: 16,
-            fontSize: 14,
-          }}
-        >
-          {error}
-        </div>
-      )}
+      {error && <ErrorAlert message={error} />}
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 20 }}>

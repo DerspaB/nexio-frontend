@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { X } from 'lucide-react';
 import { createClientSchema } from '@nexio/validations';
 import { clientsApi } from '@/lib/api';
+import { Modal } from '@/components/ui/Modal';
+import { ErrorAlert } from '@/components/ui/ErrorAlert';
 
 interface CreateClientModalProps {
   open: boolean;
@@ -64,8 +65,6 @@ export function CreateClientModal({ open, onClose, onCreated }: CreateClientModa
     }
   }
 
-  if (!open) return null;
-
   const fields = [
     { key: 'firstName', label: 'Nombre', type: 'text', placeholder: 'Juan' },
     { key: 'lastName', label: 'Apellido', type: 'text', placeholder: 'Pérez' },
@@ -83,66 +82,8 @@ export function CreateClientModal({ open, onClose, onCreated }: CreateClientModa
   });
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 50,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(0,0,0,0.4)',
-      }}
-      onClick={handleClose}
-    >
-      <div
-        style={{
-          backgroundColor: 'var(--color-surface)',
-          borderRadius: 'var(--radius-modal)',
-          padding: 'var(--spacing-xl)',
-          width: '100%',
-          maxWidth: 440,
-          position: 'relative',
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 20,
-          }}
-        >
-          <h2 style={{ fontSize: 18, fontWeight: 700 }}>Nuevo cliente</h2>
-          <button
-            onClick={handleClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: 4,
-              color: 'var(--color-text-secondary)',
-            }}
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        {error && (
-          <div
-            style={{
-              backgroundColor: '#FEE2E2',
-              color: 'var(--color-danger)',
-              padding: '12px 16px',
-              borderRadius: 'var(--radius-input)',
-              marginBottom: 16,
-              fontSize: 14,
-            }}
-          >
-            {error}
-          </div>
-        )}
+    <Modal open={open} title="Nuevo cliente" onClose={handleClose} maxWidth={440}>
+        {error && <ErrorAlert message={error} />}
 
         <form onSubmit={handleSubmit}>
           {fields.map(({ key, label, type, placeholder }) => (
@@ -213,7 +154,6 @@ export function CreateClientModal({ open, onClose, onCreated }: CreateClientModa
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

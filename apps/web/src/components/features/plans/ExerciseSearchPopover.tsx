@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import type { Exercise } from '@nexio/types';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { useExerciseSearch } from '@/hooks/use-exercise-search';
 
 interface ExerciseSearchPopoverProps {
@@ -90,16 +91,7 @@ export function ExerciseSearchPopover({ currentName, onSelect, onClose }: Exerci
         {query.length >= 2 && isLoading && (
           <div style={{ padding: '16px', textAlign: 'center' }}>
             {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  height: 14,
-                  backgroundColor: 'var(--color-border)',
-                  borderRadius: 4,
-                  marginBottom: 8,
-                  animation: 'pulse 1.5s ease-in-out infinite',
-                }}
-              />
+              <Skeleton key={i} height={14} style={{ marginBottom: 8 }} />
             ))}
           </div>
         )}

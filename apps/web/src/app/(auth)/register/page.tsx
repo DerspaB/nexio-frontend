@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { registerSchema } from '@nexio/validations';
 import { authApi, apiClient } from '@/lib/api';
+import { ErrorAlert } from '@/components/ui/ErrorAlert';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -85,20 +86,7 @@ export default function RegisterPage() {
         Registra tu organización de coaching
       </p>
 
-      {error && (
-        <div
-          style={{
-            backgroundColor: '#FEE2E2',
-            color: 'var(--color-danger)',
-            padding: '12px 16px',
-            borderRadius: 'var(--radius-input)',
-            marginBottom: 16,
-            fontSize: 14,
-          }}
-        >
-          {error}
-        </div>
-      )}
+      {error && <ErrorAlert message={error} />}
 
       <form onSubmit={handleSubmit}>
         {fields.map(({ key, label, type, placeholder }) => (

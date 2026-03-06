@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { ChevronRight, Copy, Trash2 } from 'lucide-react';
 import type { Plan } from '@nexio/types';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { PlanStatusPill } from './PlanStatusPill';
 import type { PlanStatus } from '@nexio/constants';
 
@@ -14,22 +15,14 @@ interface PlansTableProps {
 }
 
 function SkeletonRow() {
-  const skeletonBlock = (width: number): React.CSSProperties => ({
-    width,
-    height: 14,
-    backgroundColor: 'var(--color-border)',
-    borderRadius: 4,
-    animation: 'pulse 1.5s ease-in-out infinite',
-  });
-
   return (
     <tr>
-      <td style={cellStyle}><div style={skeletonBlock(160)} /></td>
-      <td style={cellStyle}><div style={skeletonBlock(70)} /></td>
-      <td style={cellStyle}><div style={skeletonBlock(120)} /></td>
-      <td style={cellStyle}><div style={skeletonBlock(80)} /></td>
-      <td style={cellStyle}><div style={skeletonBlock(70)} /></td>
-      <td style={cellStyle}><div style={skeletonBlock(60)} /></td>
+      <td style={cellStyle}><Skeleton width={160} height={14} /></td>
+      <td style={cellStyle}><Skeleton width={70} height={14} /></td>
+      <td style={cellStyle}><Skeleton width={120} height={14} /></td>
+      <td style={cellStyle}><Skeleton width={80} height={14} /></td>
+      <td style={cellStyle}><Skeleton width={70} height={14} /></td>
+      <td style={cellStyle}><Skeleton width={60} height={14} /></td>
     </tr>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Dumbbell, Plus, ChevronRight, Calendar } from 'lucide-react';
 import type { Plan } from '@nexio/types';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { plansApi } from '@/lib/api';
 import { PlanStatusPill } from '../plans/PlanStatusPill';
 import type { PlanStatus } from '@nexio/constants';
@@ -77,15 +78,7 @@ export function ClientPlanTab({ clientId }: ClientPlanTabProps) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         {Array.from({ length: 3 }).map((_, i) => (
-          <div
-            key={i}
-            style={{
-              height: 60,
-              backgroundColor: 'var(--color-border)',
-              borderRadius: 'var(--radius-card)',
-              animation: 'pulse 1.5s ease-in-out infinite',
-            }}
-          />
+          <Skeleton key={i} height={60} borderRadius="var(--radius-card)" />
         ))}
       </div>
     );
@@ -293,16 +286,7 @@ function TemplatePickerModal({
           {loading && (
             <div>
               {Array.from({ length: 3 }).map((_, i) => (
-                <div
-                  key={i}
-                  style={{
-                    height: 56,
-                    backgroundColor: 'var(--color-border)',
-                    borderRadius: 8,
-                    marginBottom: 8,
-                    animation: 'pulse 1.5s ease-in-out infinite',
-                  }}
-                />
+                <Skeleton key={i} height={56} borderRadius={8} style={{ marginBottom: 8 }} />
               ))}
             </div>
           )}

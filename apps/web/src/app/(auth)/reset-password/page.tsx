@@ -4,6 +4,7 @@ import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { authApi } from '@/lib/api';
+import { ErrorAlert } from '@/components/ui/ErrorAlert';
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
 
@@ -156,19 +157,7 @@ function ResetPasswordForm() {
       </p>
 
       {apiError && (
-        <div
-          role="alert"
-          aria-live="polite"
-          style={{
-            backgroundColor: '#FEE2E2',
-            color: '#C62828',
-            padding: '12px 16px',
-            borderRadius: 'var(--radius-input)',
-            marginBottom: 16,
-            fontSize: 14,
-          }}
-        >
-          {apiError}
+        <ErrorAlert message={apiError}>
           <Link
             href="/forgot-password"
             style={{
@@ -181,7 +170,7 @@ function ResetPasswordForm() {
           >
             Solicitar nuevo enlace →
           </Link>
-        </div>
+        </ErrorAlert>
       )}
 
       <form onSubmit={handleSubmit}>

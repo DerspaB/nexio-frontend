@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { MessageSquare, Search, SquarePen } from 'lucide-react';
 import type { ConversationListItem } from '@nexio/types';
+import { Skeleton } from '@/components/ui/Skeleton';
 import { ConversationItem } from './ConversationItem';
 
 interface ConversationListProps {
@@ -113,35 +114,10 @@ export function ConversationList({
           <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 8 }}>
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} style={{ display: 'flex', gap: 12, padding: '8px 0' }}>
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--color-border)',
-                    animation: 'pulse 1.5s ease-in-out infinite',
-                  }}
-                />
+                <Skeleton width={40} height={40} borderRadius="50%" />
                 <div style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      width: '60%',
-                      height: 14,
-                      backgroundColor: 'var(--color-border)',
-                      borderRadius: 4,
-                      marginBottom: 6,
-                      animation: 'pulse 1.5s ease-in-out infinite',
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: '80%',
-                      height: 12,
-                      backgroundColor: 'var(--color-border)',
-                      borderRadius: 4,
-                      animation: 'pulse 1.5s ease-in-out infinite',
-                    }}
-                  />
+                  <Skeleton width="60%" height={14} style={{ marginBottom: 6 }} />
+                  <Skeleton width="80%" height={12} />
                 </div>
               </div>
             ))}
