@@ -3,6 +3,7 @@
 import { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { resetPasswordSchema } from '@nexio/validations';
 import { authApi } from '@/lib/api';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 
@@ -102,22 +103,20 @@ function ResetPasswordForm() {
     );
   }
 
-  function validate(): boolean {
-    const errors: Record<string, string> = {};
-    if (password.length < 8) {
-      errors.password = 'La contraseña debe tener al menos 8 caracteres';
-    }
-    if (password !== confirmPassword) {
-      errors.confirmPassword = 'Las contraseñas no coinciden';
-    }
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setApiError('');
-    if (!validate()) return;
+    setFieldErrors({});
+
+    const result = resetPasswordSchema.safeParse({ password, confirmPassword });
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) errors[String(err.path[0])] = err.message;
+      });
+      setFieldErrors(errors);
+      return;
+    }
 
     setStatus('loading');
 

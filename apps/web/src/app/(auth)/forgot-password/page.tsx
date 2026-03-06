@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { forgotPasswordSchema } from '@nexio/validations';
 import { authApi } from '@/lib/api';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 
@@ -14,10 +15,15 @@ export default function ForgotPasswordPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim()) return;
+    setError('');
+
+    const result = forgotPasswordSchema.safeParse({ email });
+    if (!result.success) {
+      setError(result.error.errors[0].message);
+      return;
+    }
 
     setStatus('loading');
-    setError('');
 
     try {
       await authApi.forgotPassword({ email: email.trim() });
