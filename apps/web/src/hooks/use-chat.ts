@@ -5,6 +5,7 @@ import type { Socket } from 'socket.io-client';
 import type { Message } from '@nexio/types';
 import { messagingApi } from '@/lib/api';
 import { getUser } from '@/lib/auth';
+import { useToast } from '@/components/ui/Toast';
 
 interface LocalMessage extends Message {
   _status?: 'sending' | 'sent';
@@ -27,6 +28,7 @@ const TYPING_DEBOUNCE_MS = 3000;
 const TYPING_TIMEOUT_MS = 5000;
 
 export function useChat({ conversationId, socket, isConnected }: UseChatOptions) {
+  const toast = useToast();
   const [messages, setMessages] = useState<LocalMessage[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -75,11 +77,11 @@ export function useChat({ conversationId, socket, isConnected }: UseChatOptions)
       setPage(nextPage);
       setHasMore(res.page < res.totalPages);
     } catch {
-      // silent
+      toast.error('Error al cargar mensajes anteriores.');
     } finally {
       setIsLoadingMore(false);
     }
-  }, [conversationId, page, hasMore, isLoadingMore]);
+  }, [conversationId, page, hasMore, isLoadingMore, toast]);
 
   // Send message via WebSocket with optimistic update
   const sendMessage = useCallback(

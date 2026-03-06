@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ClipboardList, Search, Plus } from 'lucide-react';
 import type { PlanFilters } from '@nexio/types';
 import { plansApi } from '@/lib/api';
+import { useToast } from '@/components/ui/Toast';
 import { usePlans } from '@/hooks/use-plans';
 import { PlansTable } from '@/components/features/plans/PlansTable';
 import { CreatePlanModal } from '@/components/features/plans/CreatePlanModal';
@@ -27,6 +28,7 @@ export default function PlansPage() {
   });
   const [searchInput, setSearchInput] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
+  const toast = useToast();
   const { plans, total, page, totalPages, isLoading, mutate } = usePlans(filters);
 
   const updateFilters = useCallback((patch: Partial<PlanFilters>) => {
@@ -68,7 +70,7 @@ export default function PlansPage() {
       await plansApi.duplicatePlan(id);
       mutate();
     } catch {
-      // silent
+      toast.error('Error al duplicar el plan.');
     }
   }
 
@@ -78,7 +80,7 @@ export default function PlansPage() {
       await plansApi.deletePlan(id);
       mutate();
     } catch {
-      // silent
+      toast.error('Error al eliminar el plan.');
     }
   }
 

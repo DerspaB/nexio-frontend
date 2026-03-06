@@ -17,6 +17,7 @@ import {
 } from '@dnd-kit/sortable';
 import type { Plan, WorkoutBlock, BlockType } from '@nexio/types';
 import { plansApi, daysApi, blocksApi } from '@/lib/api';
+import { useToast } from '@/components/ui/Toast';
 import { PlanHeader } from './PlanHeader';
 import { PlanSidebar } from './PlanSidebar';
 import { WorkoutBlockCard } from './WorkoutBlockCard';
@@ -30,6 +31,7 @@ interface PlanEditorProps {
 }
 
 export function PlanEditor({ plan, onMutate }: PlanEditorProps) {
+  const toast = useToast();
   const days = useMemo(() => plan.workoutDays ?? [], [plan.workoutDays]);
   const [selectedDayId, setSelectedDayId] = useState<string | null>(days[0]?.id ?? null);
   const [localBlocks, setLocalBlocks] = useState<WorkoutBlock[]>([]);
@@ -76,11 +78,11 @@ export function PlanEditor({ plan, onMutate }: PlanEditorProps) {
       );
       onMutate();
     } catch {
-      // silent
+      toast.error('Error al guardar los cambios.');
     } finally {
       setSaving(false);
     }
-  }, [onMutate]);
+  }, [onMutate, toast]);
 
   const scheduleAutosave = useCallback(() => {
     clearTimeout(autosaveTimer.current);
@@ -119,8 +121,8 @@ export function PlanEditor({ plan, onMutate }: PlanEditorProps) {
       });
       onMutate();
     } catch {
-      // revert
       setLocalBlocks(localBlocks);
+      toast.error('Error al reordenar los bloques.');
     }
   }
 
@@ -142,7 +144,7 @@ export function PlanEditor({ plan, onMutate }: PlanEditorProps) {
       await blocksApi.createBlock(data as never);
       onMutate();
     } catch {
-      // silent
+      toast.error('Error al agregar el bloque.');
     }
   }
 
@@ -153,7 +155,7 @@ export function PlanEditor({ plan, onMutate }: PlanEditorProps) {
       await blocksApi.deleteBlock(id);
       onMutate();
     } catch {
-      // silent
+      toast.error('Error al eliminar el bloque.');
     }
   }
 
@@ -168,7 +170,7 @@ export function PlanEditor({ plan, onMutate }: PlanEditorProps) {
       setAddDayOpen(false);
       onMutate();
     } catch {
-      // silent
+      toast.error('Error al agregar el día.');
     }
   }
 
@@ -178,7 +180,7 @@ export function PlanEditor({ plan, onMutate }: PlanEditorProps) {
       await daysApi.deleteDay(dayId);
       onMutate();
     } catch {
-      // silent
+      toast.error('Error al eliminar el día.');
     }
   }
 
@@ -187,7 +189,7 @@ export function PlanEditor({ plan, onMutate }: PlanEditorProps) {
       await plansApi.updatePlan(plan.id, { name });
       onMutate();
     } catch {
-      // silent
+      toast.error('Error al actualizar el nombre.');
     }
   }
 
@@ -203,7 +205,7 @@ export function PlanEditor({ plan, onMutate }: PlanEditorProps) {
       setAssignOpen(false);
       onMutate();
     } catch {
-      // silent
+      toast.error('Error al asignar el plan.');
     } finally {
       setAssignLoading(false);
     }

@@ -5,6 +5,7 @@ import { Dumbbell, Plus, ChevronRight, Calendar } from 'lucide-react';
 import type { Plan } from '@nexio/types';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { plansApi } from '@/lib/api';
+import { useToast } from '@/components/ui/Toast';
 import { PlanStatusPill } from '../plans/PlanStatusPill';
 import type { PlanStatus } from '@nexio/constants';
 
@@ -18,6 +19,7 @@ const DAY_NAMES: Record<number, string> = {
 };
 
 export function ClientPlanTab({ clientId }: ClientPlanTabProps) {
+  const toast = useToast();
   const [plan, setPlan] = useState<Plan | null>(null);
   const [loading, setLoading] = useState(true);
   const [assignOpen, setAssignOpen] = useState(false);
@@ -34,13 +36,13 @@ export function ClientPlanTab({ clientId }: ClientPlanTabProps) {
           setPlan(full);
         }
       } catch {
-        // silent
+        toast.error('Error al cargar el plan del cliente.');
       } finally {
         setLoading(false);
       }
     }
     fetchPlan();
-  }, [clientId]);
+  }, [clientId, toast]);
 
   async function openAssignModal() {
     setAssignOpen(true);
@@ -49,7 +51,7 @@ export function ClientPlanTab({ clientId }: ClientPlanTabProps) {
       const res = await plansApi.getPlans({ isTemplate: true, limit: 50 });
       setTemplates(res.data);
     } catch {
-      // silent
+      toast.error('Error al cargar los templates.');
     } finally {
       setTemplatesLoading(false);
     }
@@ -67,7 +69,7 @@ export function ClientPlanTab({ clientId }: ClientPlanTabProps) {
         setPlan(full);
       }
     } catch {
-      // silent
+      toast.error('Error al asignar el plan.');
     } finally {
       setAssigning(false);
       setLoading(false);

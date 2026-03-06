@@ -6,6 +6,7 @@ import { Users, AlertTriangle, TrendingUp, Flame, ChevronRight } from 'lucide-re
 import type { UserPayload, Client } from '@nexio/types';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { clientsApi } from '@/lib/api';
+import { useToast } from '@/components/ui/Toast';
 
 interface KpiData {
   activeCount: number;
@@ -16,6 +17,7 @@ interface KpiData {
 
 export default function DashboardPage() {
   const router = useRouter();
+  const toast = useToast();
   const [user, setUser] = useState<UserPayload | null>(null);
   const [kpis, setKpis] = useState<KpiData | null>(null);
   const [atRiskClients, setAtRiskClients] = useState<Client[]>([]);
@@ -55,14 +57,14 @@ export default function DashboardPage() {
         });
         setAtRiskClients(atRiskRes.data);
       } catch {
-        // silent
+        toast.error('Error al cargar los datos del dashboard.');
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
-  }, []);
+  }, [toast]);
 
   const kpiCards = [
     {

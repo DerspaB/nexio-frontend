@@ -5,6 +5,7 @@ import { ClipboardCheck } from 'lucide-react';
 import type { CheckIn } from '@nexio/types';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { checkInsApi } from '@/lib/api';
+import { useToast } from '@/components/ui/Toast';
 
 interface ClientCheckInsTabProps {
   clientId: string;
@@ -24,6 +25,7 @@ function formatDate(dateStr: string) {
 }
 
 export function ClientCheckInsTab({ clientId }: ClientCheckInsTabProps) {
+  const toast = useToast();
   const [checkIns, setCheckIns] = useState<CheckIn[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,13 +42,13 @@ export function ClientCheckInsTab({ clientId }: ClientCheckInsTabProps) {
         });
         setCheckIns(res.data);
       } catch {
-        // silent
+        toast.error('Error al cargar los check-ins.');
       } finally {
         setLoading(false);
       }
     }
     fetch();
-  }, [clientId]);
+  }, [clientId, toast]);
 
   const heatmapData = useMemo(() => {
     const map = new Map<string, boolean>();
